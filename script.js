@@ -44,12 +44,31 @@ const searchBtn = document.getElementById('searchBtn');
 const clearBtn = document.getElementById('clearBtn');
 const recommendationsDiv = document.getElementById('recommendations');
 
+function isHomePagePath() {
+    const path = window.location.pathname || '';
+    return path.endsWith('/') || path.endsWith('/index.html') || path === '/' || path === '';
+}
+
 // Search Function
 function performSearch() {
+    if (!searchInput) return;
+
+    // Recommendations panel exists only on the home page. If the user searches
+    // from another page, redirect to home and restore the query there.
+    if (!recommendationsDiv) {
+        const query = searchInput.value.trim();
+        if (query) {
+            sessionStorage.setItem('travelSearch', query);
+        }
+        window.location.href = 'index.html';
+        return;
+    }
+
     const keyword = searchInput.value.toLowerCase().trim();
 
     if (!keyword) {
         recommendationsDiv.classList.remove('show');
+        recommendationsDiv.innerHTML = '';
         return;
     }
 
@@ -186,7 +205,7 @@ if (bookBtn) {
 initContactForm();
 
 // Handle navigation between pages - preserve search on index page
-if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
+if (isHomePagePath()) {
     // Check if coming from another page with search query
     const savedSearch = sessionStorage.getItem('travelSearch');
     if (savedSearch && searchInput) {
@@ -199,7 +218,7 @@ if (window.location.pathname.includes('index.html') || window.location.pathname 
 // Save search query before leaving index page
 if (searchInput) {
     window.addEventListener('beforeunload', () => {
-        if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
+        if (isHomePagePath()) {
             sessionStorage.setItem('travelSearch', searchInput.value);
         }
     });
