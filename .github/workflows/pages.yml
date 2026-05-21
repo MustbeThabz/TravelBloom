@@ -30,7 +30,13 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p dist
-          cp index.html about.html contact.html style.css script.js .nojekyll dist/
+          if [ -d docs ]; then
+            cp docs/index.html docs/about.html docs/contact.html docs/style.css docs/script.js docs/.nojekyll dist/
+            if [ -f docs/CNAME ]; then cp docs/CNAME dist/; fi
+          else
+            cp index.html about.html contact.html style.css script.js .nojekyll dist/
+            if [ -f CNAME ]; then cp CNAME dist/; fi
+          fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
